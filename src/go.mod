@@ -1,1 +1,1 @@
-module shupload
+module github.com/kettek/shupload

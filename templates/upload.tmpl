@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>shupload</title>
+  <link rel="icon" type="image/png" href="./static/shupload-32x32.png" />
+  <link rel="stylesheet" type="text/css" href="./static/style.css" />
+  <link href="https://fonts.googleapis.com/css?family=ZCOOL+QingKe+HuangYou" rel="stylesheet">
+  <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+  <script src="https://unpkg.com/mithril/mithril.js"></script>
+  <script type="text/javascript" src="./static/shupload.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+</head>
+<body>
+  <section id="Container">
+    <section id="Main" class="Upload">
+      <form class="TabContent" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <button type="submit">Upload!</button>
+      </form>
+    </section>
+  </section>
+  <small id="Footer"><a href="https://github.com/kettek/shupload">shupload</a> copyright © 2018-2019 <a href="https://kettek.net">Ketchetwahmeegwun T. Southall</a>. Licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPLv3</a></small>
+</body>
+</html>

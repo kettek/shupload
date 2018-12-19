@@ -1,0 +1,325 @@
+* {
+  box-sizing: border-box;
+}
+html {
+  width: 100%;
+  height: 100%;
+}
+body {
+  background-color: #010109;
+  color: #cacada;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  padding: .5em;
+  text-align: center;
+}
+body, input, button, textarea {
+  font-family: 'ZCOOL QingKe HuangYou';
+  letter-spacing: 0.1vw;
+  font-size: 1.5vmax;
+}
+input, button {
+  margin: .5em;
+  padding: .5em;
+}
+textarea {
+  border: 0;
+  padding: .5em;
+  color: #cacada;
+  background-color: transparent;
+}
+
+a {
+  color: #8a8ada;
+}
+
+#Container {
+  flex: 1;
+  min-width: 50%;
+  align-items: center;
+  justify-content: center;
+  animation: .5s 1 normal FadeIn;
+}
+
+#Footer {
+  font-size: 1vmax;
+  padding: .5em;
+}
+
+#Main {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+#Main.View {
+}
+#Main.View .TabContent::after {
+  box-shadow: none;
+}
+#Main.View .TabContent {
+  height: 0
+}
+#Main.View .TabContent.ZoomedIn {
+  height: auto;
+  align-items: stretch;
+  justify-content: stretch;
+  overflow: auto;
+  position: static;
+}
+#Main.View .TabContent.ZoomedIn .ImageContainer {
+  flex: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: zoom-out;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+#Main.View .TabContent.ZoomedOut .ImageContainer {
+  cursor: zoom-in;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+#Main.View .TabContent.Scaled {
+  position: relative;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  justify-content: center;
+  align-items: center;
+}
+#Main.View .TabContent.Scaled {
+}
+#Main.View .TabContent.Scaled.ZoomedIn .ImageContainer {
+  position: static;
+}
+
+#Main.View .Tab {
+  flex: 0;
+}
+/*
+Hacky stuff for CSS image click
+*/
+.NoJS .ImageContainer {
+  flex: 1;
+  display: flex;
+  flex-flow: row nowrap;
+  cursor: zoom-in;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.NoJS .ImageContainer label input {
+  display: none;
+}
+.NoJS .ImageContainer label img {
+  object-fit: cover;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  cursor: zoom-in;
+}
+.NoJS .ImageContainer label input:checked ~ img {
+  object-fit: cover;
+  width: auto;
+  height: auto;
+  margin: auto;
+  max-width: none;
+  max-height: none;
+  cursor: zoom-out;
+}
+
+.Tabs {
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+  background-color: #313139;
+  box-shadow: inset 0 0 2px 0px black;
+}
+.Tab {
+  flex: 1;
+  border-radius: 0;
+  padding: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #8a8a9a;
+  user-select: none;
+  transition: .2s all;
+}
+.Tab:hover {
+  background-color: #212129;
+}
+.Tabs > a {
+  text-decoration: none;
+}
+.Tab:hover, .Tabs > a {
+  color: #aaaaba;
+}
+.Tab.selected, .Tabs > a {
+  color: #eaeafa;
+}
+.Tab.disabled, .Tab.selected a {
+  color: #4a4a5a;
+}
+.TabContent {
+  position: relative;
+  flex: 1;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #111119;
+}
+.TabContent.NoJS {
+  align-items: stretch;
+  justify-content: stretch;
+}
+.TabContent * {
+  z-index: 2;
+}
+.TabContent::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.05;
+  background-image: url('shupload.svg');
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+.TabContent::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-shadow: inset 0 0 8px 0px black;
+  pointer-events: none;
+}
+.Clipboard {
+  flex: 1;
+  width: 100%;
+}
+
+.Buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: .5em;
+  min-height: 2.25em;
+}
+
+.Button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background-color: #313139;
+  box-shadow: inset 0 0 1px 0px black;
+  padding: .5em;
+  margin: 0 .5em;
+  min-height: 2.25em;
+  cursor: pointer;
+  color: #aaaaba;
+  transition: .2s all;
+}
+.Button:hover {
+  color: #eaeafa;
+  background-color: #212129;
+}
+
+.Label {
+  /*padding: .5em;*/
+  margin: .5em;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.Label a {
+  text-decoration: none;
+}
+
+video {
+  max-width: 100%;
+  overflow: auto;
+}
+.Preview {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  flex: 1;
+}
+
+#UploadBar, #StatusBar {
+  box-shadow: inset 0 0 2px 0px black;
+  background-color: #313139;
+  border-radius: 0 0 8px 8px;
+  padding: .25em 0.5em;
+  text-align: center;
+  transition: all .250s;
+}
+#UploadBar.error {
+  background-color: #a13139;
+}
+#UploadBar.pending {
+  background-color: #3131a9;
+}
+#UploadBar.success {
+  background-color: #31a139;
+}
+
+.hidden {
+  display: none;
+}
+
+/* mobile */
+@media (pointer:coarse) {
+  body {
+    padding: 0;
+  }
+  #Main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+  }
+  body, input, button {
+    font-size: 2.5vmax;
+  }
+  .Tabs {
+    border-radius: 0;
+  }
+}
+/* fluff */
+@keyframes FadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1.0;
+  }
+}

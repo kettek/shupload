@@ -58,3 +58,9 @@ location /upload/ {
 	proxy_redirect ~^/(.*) https://<mydomain>/upload/$1;
 }
 ```
+
+Additionally, nginx limits file uploads to 1M so you may wish to place the following line in either the location, server, or global sections:
+
+```
+	client_max_body_size 100M;
+```

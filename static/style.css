@@ -290,6 +290,10 @@ video {
 #UploadBar.success {
   background-color: #31a139;
 }
+#StatusBar {
+  display: flex;
+  justify-content: space-between;
+}
 
 .hidden {
   display: none;

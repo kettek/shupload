@@ -390,7 +390,10 @@ let shupload =  (function() {
   let StatusBar = {
     Component: {
       view: () => {
-        return m("#StatusBar", View.CreationTime)
+        return m("#StatusBar", [
+          m('span', View.HiddenImage.width + 'x' + View.HiddenImage.height, ' ➡️ ' + Math.round(View.ImageWidth) + 'x' + Math.round(View.ImageHeight)),
+          m('span#Date', View.CreationTime)
+        ])
       }
     }
   }

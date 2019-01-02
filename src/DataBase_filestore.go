@@ -33,6 +33,7 @@ import (
   "mime/multipart"
   "path"
   "os"
+  "sync"
 )
 
 type FileDriver struct {
@@ -68,6 +69,7 @@ type MetaDriver struct {
   root string
   file *os.File
   db map[string]DataBaseEntry
+  writeLock sync.RWMutex
 }
 func NewMetaDriver(db string) (m *MetaDriver, err error) {
   m = &MetaDriver{
@@ -93,14 +95,18 @@ func (m *MetaDriver) Get(key string) (entry DataBaseEntry, err error) {
   return
 }
 func (m *MetaDriver) Write(key string, entry DataBaseEntry) (err error) {
+  m.writeLock.Lock()
   m.db[key] = entry
   err = m.Sync()
+  m.writeLock.Unlock()
   return
 }
 
 func (m *MetaDriver) Remove(key string) (err error) {
+  m.writeLock.Lock()
   delete(m.db, key)
   err = m.Sync()
+  m.writeLock.Unlock()
   return
 }
 

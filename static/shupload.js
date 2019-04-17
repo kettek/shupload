@@ -1,4 +1,7 @@
 /*
+@licstart The following is the entire license notice for the JavaScript code in
+this page.
+
 Copyright 2018-2019 Ketchetwahmeegwun T. Southall
 
 This file is part of shupload.
@@ -15,6 +18,9 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with shupload.  If not, see <https://www.gnu.org/licenses/>.
+
+@licend The above is the entire license notice for the JavaScript code in this
+page.
 
 ----
 

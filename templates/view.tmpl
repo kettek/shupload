@@ -20,7 +20,12 @@
       </section>
       <section class="TabContent NoJS">
         <div class="DataContainer">
-        {{if regexMatch "audio/.*" .Mimetype}}
+        {{if or (eq .Filename "blob") (regexMatch "image/.*" .Mimetype) }}
+          <label>
+            <input type="checkbox">
+            <img src="{{.URI}}">
+          </label>
+        {{else if regexMatch "audio/.*" .Mimetype}}
           <audio controls src="{{.URI}}">
             Your browser does not support the <code>audio</code> element.
           </audio>
@@ -30,10 +35,7 @@
             Your browser does not support the <code>video</code> element.
           </video>
         {{else}}
-          <label>
-            <input type="checkbox">
-            <img src="{{.URI}}">
-          </label>
+          Cannot display file with mimetype of "{{.Mimetype}}".
         {{end}}
         </div>
       </section>

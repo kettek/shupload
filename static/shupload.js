@@ -404,6 +404,7 @@ let shupload =  (function() {
   let View = {
     Filename: "",
     Entryname: "",
+    Type: "image",
     HiddenImage: document.createElement('img'),
     TabContent: null,
     ImageHeight: "",
@@ -484,14 +485,32 @@ let shupload =  (function() {
               }
             },
             [
-            m('.ImageContainer'+ (View.ImageZoom ? '.Zoomed' : ''), {
-              style: "width: "+View.ImageWidth+"px;height: "+View.ImageHeight+"px;background-image: url(" + View.Entryname + "/" + View.Filename + ");",
-              onclick: e => {
-                e.preventDefault()
-                View.isZoomed = !View.isZoomed
-                View.calculateImageSize()
-              }
-            })
+            View.Type === "image" ? 
+              m('.DataContainer'+ (View.ImageZoom ? '.Zoomed' : ''), {
+                style: "width: "+View.ImageWidth+"px;height: "+View.ImageHeight+"px;background-image: url(" + View.Entryname + "/" + View.Filename + ");",
+                onclick: e => {
+                  e.preventDefault()
+                  View.isZoomed = !View.isZoomed
+                  View.calculateImageSize()
+                }
+              })
+            : View.Type === "audio" ?
+              m('.DataContainer', 
+                m('audio', {
+                  controls: true,
+                  src: View.Entryname+"/"+View.Filename,
+                })
+              )
+            : View.Type === "video" ?
+              m('.DataContainer',
+                m('video', {
+                  controls: true,
+                }, m('source', {
+                  src: View.Entryname+"/"+View.Filename,
+                  type: View.Mimetype,
+                }))
+              )
+            : null
           ]),
           m(StatusBar.Component)
         ])
@@ -503,16 +522,36 @@ let shupload =  (function() {
       let target = document.getElementById("Container")
       if (target.children[0].className == "View") {
         // First we retrieve the image reference
-        let parts = document.getElementsByTagName("img")[0].getAttribute('src').split('/')
-        View.Entryname = parts[0]
-        View.Filename = parts[1]
-        View.HiddenImage.addEventListener('load', e => {
-          View.calculateImageSize()
-        })
-        window.addEventListener('resize', e => {
-          View.calculateImageSize()
-        })
-        View.HiddenImage.src = parts.join('/')
+        let img = document.getElementsByTagName("img")[0]
+        let audio = document.getElementsByTagName("audio")[0]
+        let video = document.getElementsByTagName("video")[0]
+        if (img) {
+          let parts = img.getAttribute('src').split('/')
+          View.Entryname = parts[0]
+          View.Filename = parts[1]
+          View.Type = "image"
+          View.HiddenImage.addEventListener('load', e => {
+            View.calculateImageSize()
+          })
+          window.addEventListener('resize', e => {
+            View.calculateImageSize()
+          })
+          View.HiddenImage.src = parts.join('/')
+        } else if (audio) {
+          let parts = audio.getAttribute('src').split('/')
+          View.Entryname = parts[0]
+          View.Filename = parts[1]
+          View.Type = "audio"
+        } else if (video) {
+          let source = video.getElementsByTagName("source")[0]
+          if (source) {
+            let parts = source.getAttribute('src').split('/')
+            View.Entryname = parts[0]
+            View.Filename = parts[1]
+            View.Type = "video"
+            View.Mimetype = source.getAttribute('type')
+          }
+        }
         View.CreationTime = document.getElementById("StatusBar").innerHTML
         m.mount(document.getElementById("Container"), View.Component)
       } else if (target.children[0].className == "Upload") {

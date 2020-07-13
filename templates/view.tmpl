@@ -19,11 +19,22 @@
         <div class="Label" style="flex: 1"><a href="{{.Entryname}}/{{.Filename}}">🔗</a>&nbsp;{{.Filename}}&nbsp;<a href="{{.Entryname}}/{{.Filename}}">⬇</a></div>
       </section>
       <section class="TabContent NoJS">
-        <div class="ImageContainer">
+        <div class="DataContainer">
+        {{if regexMatch "image/.*" .Mimetype}}
           <label>
             <input type="checkbox">
             <img src="{{.URI}}">
           </label>
+        {{else if regexMatch "audio/.*" .Mimetype}}
+          <audio controls src="{{.URI}}">
+            Your browser does not support the <code>audio</code> element.
+          </audio>
+        {{else if regexMatch "video/.*" .Mimetype}}
+          <video controls>
+            <source src="{{.URI}}" type={{.Mimetype}}>
+            Your browser does not support the <code>video</code> element.
+          </video>
+        {{end}}
         </div>
       </section>
       <div id="StatusBar">

@@ -564,7 +564,10 @@ let shupload =  (function() {
           if (a) {
             let parts = a.getAttribute('href').split('/')
             View.Entryname = parts[0]
-            View.Filename = parts[1]
+          }
+          let fpart = document.getElementById("Filename")
+          if (fpart) {
+            View.Filename = fpart.innerText
           }
           View.DataHTML = document.getElementsByClassName("DataContainer")[0].innerText
         }

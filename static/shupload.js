@@ -528,6 +528,10 @@ let shupload =  (function() {
     letsGo: () => {
       let target = document.getElementById("Container")
       if (target.children[0].className == "View") {
+        let fpart = document.getElementById("Filename")
+        if (fpart) {
+          View.Filename = fpart.innerText
+        }
         // First we retrieve the image reference
         let img = document.getElementsByTagName("img")[0]
         let audio = document.getElementsByTagName("audio")[0]
@@ -535,7 +539,6 @@ let shupload =  (function() {
         if (img) {
           let parts = img.getAttribute('src').split('/')
           View.Entryname = parts[0]
-          View.Filename = parts[1]
           View.Type = "image"
           View.HiddenImage.addEventListener('load', e => {
             View.calculateImageSize()
@@ -547,14 +550,12 @@ let shupload =  (function() {
         } else if (audio) {
           let parts = audio.getAttribute('src').split('/')
           View.Entryname = parts[0]
-          View.Filename = parts[1]
           View.Type = "audio"
         } else if (video) {
           let source = video.getElementsByTagName("source")[0]
           if (source) {
             let parts = source.getAttribute('src').split('/')
             View.Entryname = parts[0]
-            View.Filename = parts[1]
             View.Type = "video"
             View.Mimetype = source.getAttribute('type')
           }
@@ -564,10 +565,6 @@ let shupload =  (function() {
           if (a) {
             let parts = a.getAttribute('href').split('/')
             View.Entryname = parts[0]
-          }
-          let fpart = document.getElementById("Filename")
-          if (fpart) {
-            View.Filename = fpart.innerText
           }
           View.DataHTML = document.getElementsByClassName("DataContainer")[0].innerText
         }

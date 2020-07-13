@@ -411,6 +411,7 @@ let shupload =  (function() {
   let View = {
     Filename: "",
     Entryname: "",
+    Propername: "",
     Type: "",
     HiddenImage: document.createElement('img'),
     TabContent: null,
@@ -478,7 +479,7 @@ let shupload =  (function() {
                 },
                 title: "Copy Link to Clipboard"
               }, '🔗'),
-              m('.Label', View.Filename),
+              m('.Label', View.Propername),
               m('a', {
                 href: View.Entryname+'/'+View.Filename,
                 title: "Download file"
@@ -530,7 +531,7 @@ let shupload =  (function() {
       if (target.children[0].className == "View") {
         let fpart = document.getElementById("Filename")
         if (fpart) {
-          View.Filename = fpart.innerText
+          View.Propername = fpart.innerText
         }
         // First we retrieve the image reference
         let img = document.getElementsByTagName("img")[0]
@@ -539,6 +540,7 @@ let shupload =  (function() {
         if (img) {
           let parts = img.getAttribute('src').split('/')
           View.Entryname = parts[0]
+          View.Filename = parts[1]
           View.Type = "image"
           View.HiddenImage.addEventListener('load', e => {
             View.calculateImageSize()
@@ -550,12 +552,14 @@ let shupload =  (function() {
         } else if (audio) {
           let parts = audio.getAttribute('src').split('/')
           View.Entryname = parts[0]
+          View.Filename = parts[1]
           View.Type = "audio"
         } else if (video) {
           let source = video.getElementsByTagName("source")[0]
           if (source) {
             let parts = source.getAttribute('src').split('/')
             View.Entryname = parts[0]
+            View.Filename = parts[1]
             View.Type = "video"
             View.Mimetype = source.getAttribute('type')
           }
@@ -565,6 +569,7 @@ let shupload =  (function() {
           if (a) {
             let parts = a.getAttribute('href').split('/')
             View.Entryname = parts[0]
+            View.Filename = parts[1]
           }
           View.DataHTML = document.getElementsByClassName("DataContainer")[0].innerText
         }

@@ -411,7 +411,7 @@ let shupload =  (function() {
   let View = {
     Filename: "",
     Entryname: "",
-    Type: "image",
+    Type: "",
     HiddenImage: document.createElement('img'),
     TabContent: null,
     ImageHeight: "",
@@ -517,7 +517,7 @@ let shupload =  (function() {
                   type: View.Mimetype,
                 }))
               )
-            : null
+            : m('.DataContainer', m.trust(View.DataHTML))
           ]),
           m(StatusBar.Component)
         ])
@@ -558,6 +558,15 @@ let shupload =  (function() {
             View.Type = "video"
             View.Mimetype = source.getAttribute('type')
           }
+        } else {
+          let target = document.getElementsByClassName("Label")[0]
+          let a = target.getElementsByTagName("a")[0]
+          if (a) {
+            let parts = a.getAttribute('href').split('/')
+            View.Entryname = parts[0]
+            View.Filename = parts[1]
+          }
+          View.DataHTML = document.getElementsByClassName("DataContainer")[0].innerText
         }
         View.CreationTime = document.getElementById("StatusBar").innerHTML
         m.mount(document.getElementById("Container"), View.Component)

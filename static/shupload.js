@@ -83,6 +83,7 @@ let shupload =  (function() {
                 navigator.mediaDevices.getUserMedia({
                   video: true
                 }).then((stream) => {
+                  pv.state.filename = stream.getVideoTracks()[0].label
                   vnode.dom.srcObject = stream
                 }).catch((err) => {
                   alert(err)
@@ -118,7 +119,7 @@ let shupload =  (function() {
                   m(".Button", {
                     onclick: () => {
                     	Canvas.toBlob((blob) => {
-                        sendFile(blob)
+                        sendFile(blob, pv.state.filename+".png")
                     	})
                     }
                   }, "⇪ Upload")
@@ -152,6 +153,7 @@ let shupload =  (function() {
                   navigator.getDisplayMedia({
                     video: true
                   }).then((stream) => {
+                    pv.state.filename = stream.getVideoTracks()[0].label
                     vnode.dom.srcObject = stream
                   }).catch((err) => {
                     console.log(err)
@@ -161,6 +163,7 @@ let shupload =  (function() {
                   navigator.mediaDevices.getDisplayMedia({
                     video: true
                   }).then((stream) => {
+                    pv.state.filename = stream.getVideoTracks()[0].label
                     vnode.dom.srcObject = stream
                   }).catch((err) => {
                     console.log(err)
@@ -210,7 +213,7 @@ let shupload =  (function() {
                   m(".Button", {
                     onclick: () => {
                     	Canvas.toBlob((blob) => {
-                        sendFile(blob)
+                        sendFile(blob, pv.state.filename+".png")
                     	})
                     }
                   }, "⇪ Upload")
@@ -346,12 +349,16 @@ let shupload =  (function() {
     }
   }
   // Method for sending a file via POST
-  function sendFile(file) {
+  function sendFile(file, filename) {
     UploadBar.State = UploadBar.States.Sending
     let r = new XMLHttpRequest()
     let d = new FormData()
     //r.setRequestHeader('Content-type', 'multipart/form-data')
-    d.append('file', file)
+    if (filename !== undefined) {
+      d.append('file', file, filename)
+    } else {
+      d.append('file', file)
+    }
     r.addEventListener('load', (e) => {
       UploadBar.State = UploadBar.States.Success
       UploadBar.StartTime = new Date()

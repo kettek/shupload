@@ -43,6 +43,7 @@ func (a *App) Init() (err error) {
     EntryKeyLength: 8,
     Address: ":8088",
     DatabaseLocation: "db",
+    MaxFilenameLength: 100,
   }
 
   err = AppInstance.Config.Load("config.json")

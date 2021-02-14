@@ -44,6 +44,7 @@ func (a *App) Init() (err error) {
     Address: ":8088",
     DatabaseLocation: "db",
     MaxFilenameLength: 100,
+    MaxFileSize: 20000,
   }
 
   err = AppInstance.Config.Load("config.json")

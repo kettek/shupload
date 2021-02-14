@@ -56,6 +56,19 @@ func (fd *FileDriver) Write(key string, r io.ReadCloser) (err error) {
   if err != nil {
     return
   }
+  
+  info,err := os.Stat(path.Join(fd.root, key))
+  var kbLimit int64 = 1024
+  var fileSize int64 = info.Size()
+  kbSize := float64(fileSize) / float64(kbLimit)
+
+  if (int(kbSize) > AppInstance.Config.MaxFileSize) {
+    os.Remove(path.Join(fd.root, key))
+    if err != nil {
+      return
+    }
+  }
+  
   return
 }
 

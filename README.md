@@ -43,6 +43,7 @@ The possible options are:
 | DatabaseLocation | string    | "db"            | The directory name/location of the database storage. |
 | EntryKeyRunes    | []string  | `["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]` | The runes from which to randomly generate an entry's key. |
 | EntryKeyLength   | int       | 8               | How many runes an entry should consist of. |
+| MaxFilenameLength | int | 100 | The maximum runes allowed for uploaded file names. |
 
 ## Storage format
 shupload uses a simple file-based storage provided by `DataBase_filestore.go`. It writes uploaded image data under the `db` directory and the accompanying metadata (upload time, filename, mimetype) entries in the `db.json` file.

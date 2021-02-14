@@ -134,6 +134,11 @@ func (d *DataBase) Init() (err error) {
 
 func (d *DataBase) CreateEntry(r multipart.File, h *multipart.FileHeader) (entry DataBaseEntry, key string, err error) {
   key = d.GetKey()
+  
+  if (len(h.Filename) > AppInstance.Config.MaxFilenameLength) {
+    return
+  }
+  
   entry = DataBaseEntry{
     CreationTime: time.Now(),
     Filename: h.Filename,

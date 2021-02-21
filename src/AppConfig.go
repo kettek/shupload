@@ -29,7 +29,8 @@ type AppConfig struct {
   EntryKeyLength int `json:"EntryKeyLength"`
   Address string `json:"Address"`
   DatabaseLocation string `json:"DatabaseLocation"`
-  MaxFilenameLength int `json:MaxFilenameLength`
+  MaxFilenameLength int `json:"MaxFilenameLength"`
+  MaxFileSize int `json:"MaxFileSize"`
 }
 
 func (a *AppConfig) Load(filename string) (err error) {

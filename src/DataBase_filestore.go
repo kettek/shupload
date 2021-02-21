@@ -56,19 +56,6 @@ func (fd *FileDriver) Write(key string, r io.ReadCloser) (err error) {
   if err != nil {
     return
   }
-  
-  info,err := os.Stat(path.Join(fd.root, key))
-  var kbLimit int64 = 1024
-  var fileSize int64 = info.Size()
-  kbSize := float64(fileSize) / float64(kbLimit)
-
-  if (int(kbSize) > AppInstance.Config.MaxFileSize) {
-    os.Remove(path.Join(fd.root, key))
-    if err != nil {
-      return
-    }
-  }
-  
   return
 }
 
@@ -147,11 +134,19 @@ func (d *DataBase) Init() (err error) {
 
 func (d *DataBase) CreateEntry(r multipart.File, h *multipart.FileHeader) (entry DataBaseEntry, key string, err error) {
   key = d.GetKey()
-  
+
   if (len(h.Filename) > AppInstance.Config.MaxFilenameLength) {
     return
   }
-  
+
+  var kbLimit int64 = 1024
+  var fileSize int64 = h.Size
+  kbSize := float64(fileSize) / float64(kbLimit)
+
+  if (int(kbSize) > AppInstance.Config.MaxFileSize) {
+    return
+  }
+
   entry = DataBaseEntry{
     CreationTime: time.Now(),
     Filename: h.Filename,

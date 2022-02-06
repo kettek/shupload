@@ -95,9 +95,6 @@ a {
 }
 #Main.View .TabContent.Scaled {
 }
-#Main.View .TabContent.Scaled.ZoomedIn .DataContainer {
-  position: static;
-}
 
 #Main.View .Tab {
   flex: 0;
@@ -106,9 +103,6 @@ a {
 Hacky stuff for CSS image click
 */
 .NoJS .DataContainer {
-  flex: 1;
-  display: flex;
-  flex-flow: row nowrap;
   cursor: zoom-in;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -181,10 +175,6 @@ Hacky stuff for CSS image click
   align-items: center;
   justify-content: center;
   background-color: #111119;
-}
-.TabContent.NoJS {
-  align-items: stretch;
-  justify-content: stretch;
 }
 .TabContent * {
   z-index: 2;

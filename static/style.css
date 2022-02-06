@@ -71,8 +71,11 @@ a {
 #Main.View .TabContent.ZoomedIn .DataContainer {
   flex: auto;
   z-index: 2;
-  top: 0;
-  left: 0;
+  /* breaking gif zoom? 
+    position: absolute;
+    top: 0;
+    left: 0;
+  */
   cursor: zoom-out;
   background-size: contain;
   background-repeat: no-repeat;

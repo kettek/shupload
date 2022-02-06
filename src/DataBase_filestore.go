@@ -22,17 +22,17 @@ This file implements a very basic file-based storage system. It simply puts the 
 package main
 
 import (
-  "encoding/json"
-  "mime"
-  "path/filepath"
-  //
-  "log"
-  "io"
-  "io/ioutil"
-  "time"
-  "mime/multipart"
-  "path"
-  "os"
+	"encoding/json"
+	"mime"
+	"path/filepath"
+
+	//
+	"io"
+	"io/ioutil"
+	"mime/multipart"
+	"os"
+	"path"
+	"time"
 )
 
 type FileDriver struct {
@@ -58,7 +58,6 @@ func (fd *FileDriver) Write(key string, r io.ReadCloser) (err error) {
   }
   return
 }
-
 func (fd *FileDriver) ReadStream(key string) (r io.ReadSeeker, err error) {
   r, err = os.Open(path.Join(fd.root, key))
   return
@@ -67,7 +66,7 @@ func (fd *FileDriver) ReadStream(key string) (r io.ReadSeeker, err error) {
 type MetaDriver struct {
   root string
   file *os.File
-  db map[string]DataBaseEntry
+  db map[string][]DataBaseEntry
 }
 func NewMetaDriver(db string) (m *MetaDriver, err error) {
   m = &MetaDriver{
@@ -79,31 +78,27 @@ func NewMetaDriver(db string) (m *MetaDriver, err error) {
   }
   bytes, _ := ioutil.ReadAll(m.file)
 
-  m.db = make(map[string]DataBaseEntry)
+  m.db = make(map[string][]DataBaseEntry)
   json.Unmarshal([]byte(bytes), &m.db)
-  log.Print(m.db)
-
   return
 }
-func (m *MetaDriver) Get(key string) (entry DataBaseEntry, err error) {
-  entry, ok := m.db[key]
+func (m *MetaDriver) Get(key string) (entries []DataBaseEntry, err error) {
+  entries, ok := m.db[key]
   if !ok {
     // TODO: return error (does not exist)
   }
   return
 }
-func (m *MetaDriver) Write(key string, entry DataBaseEntry) (err error) {
-  m.db[key] = entry
+func (m *MetaDriver) Write(key string, entries []DataBaseEntry) (err error) {
+  m.db[key] = entries
   err = m.Sync()
   return
 }
-
 func (m *MetaDriver) Remove(key string) (err error) {
   delete(m.db, key)
   err = m.Sync()
   return
 }
-
 func (m *MetaDriver) Sync() (err error) {
   var data []byte
   data, err = json.Marshal(m.db)
@@ -122,7 +117,6 @@ type DataBase struct {
   fileDB *FileDriver
   metaDB *MetaDriver
 }
-
 func (d *DataBase) Init() (err error) {
   d.fileDB, err = NewFileDriver(AppInstance.Config.DatabaseLocation)
   if err != nil {
@@ -131,49 +125,49 @@ func (d *DataBase) Init() (err error) {
   d.metaDB, err = NewMetaDriver(AppInstance.Config.DatabaseLocation+".json")
   return
 }
+func (d *DataBase) CreateEntries(h []*multipart.FileHeader) (entries []DataBaseEntry, key string, err error) {
+	entries = make([]DataBaseEntry, len(h))
+	key = d.GetKey()
 
-func (d *DataBase) CreateEntry(r multipart.File, h *multipart.FileHeader) (entry DataBaseEntry, key string, err error) {
-  key = d.GetKey()
-
-  if (len(h.Filename) > AppInstance.Config.MaxFilenameLength) {
-    return
-  }
-
-  var kbLimit int64 = 1024
-  var fileSize int64 = h.Size
-  kbSize := float64(fileSize) / float64(kbLimit)
-
-  if (int(kbSize) > AppInstance.Config.MaxFileSize) {
-    return
-  }
-
-  entry = DataBaseEntry{
-    CreationTime: time.Now(),
-    Filename: h.Filename,
-    Mimetype: mime.TypeByExtension(filepath.Ext(h.Filename)),
-  }
-  err = d.metaDB.Write(key, entry)
+	for i, header := range h {
+		entryKey := d.GetKey()
+		if (len(header.Filename) > AppInstance.Config.MaxFilenameLength) {
+			return
+		}
+	
+		var kbLimit int64 = 1024
+		var fileSize int64 = header.Size
+		kbSize := float64(fileSize) / float64(kbLimit)
+	
+		if (int(kbSize) > AppInstance.Config.MaxFileSize) {
+			return
+		}
+	
+		entry := DataBaseEntry{
+			Key: entryKey,
+			CreationTime: time.Now(),
+			Filename: header.Filename,
+			Mimetype: mime.TypeByExtension(filepath.Ext(header.Filename)),
+		}
+		entries[i] = entry
+		file, _ := header.Open()
+		err = d.fileDB.Write(entryKey, file)
+	}
+  err = d.metaDB.Write(key, entries)
   if err != nil {
     return
   }
-  err = d.fileDB.Write(key, r)
-  if err != nil {
-    d.metaDB.Remove(key)
-    return
-  }
+
   return
 }
-
-func (d *DataBase) GetEntry(key string) (entry DataBaseEntry, err error) {
-  entry, err = d.metaDB.Get(key)
+func (d *DataBase) GetEntries(key string) (entries []DataBaseEntry, err error) {
+  entries, err = d.metaDB.Get(key)
   return
 }
-
 func (d *DataBase) GetEntryStream(key string) (r io.ReadSeeker, err error) {
   r, err = d.fileDB.ReadStream(key)
   return
 }
-
 func (d *DataBase) KeyExists(key string) bool {
   return false
   //return d.fileDB.Has(key)

@@ -518,7 +518,7 @@ let shupload = (function () {
                     },
                     title: "Copy Link to Clipboard"
                   }, '🔗'),
-                  m('.Label', view.Filename),
+                  m('.Label', decodeURIComponent(view.Filename)),
                   m('a', {
                     href: view.Entryname + '/' + view.Filename,
                     title: "Download file"

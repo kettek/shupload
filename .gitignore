@@ -1,0 +1,5 @@
+# Ignore DB files
+/db/*
+**/db.json
+# Ignore executable
+**/shupload

@@ -35,27 +35,46 @@ This file is an optional JavaScript enhancement for shupload. It provides:
 FIXME: This is pretty weird and messy!
 TODO: actual comments
 */
-let shupload =  (function() {
+
+let shupload = (function () {
+  // Method for presenting the user with a file select prompt
+  function selectFile() {
+    let inp = document.createElement('input')
+    inp.setAttribute('type', 'file')
+    inp.setAttribute('accept', 'image/*')
+    inp.setAttribute('multiple', true)
+    inp.style = "display:none";
+    inp.addEventListener('change', (e) => {
+      console.log(e.target.files);
+      sendFile(e.target.files)
+      inp.parentNode.removeChild(inp)
+    })
+    // element must exist for iOS so we add it
+    document.body.appendChild(inp)
+    inp.click()
+  }
+
   // Canvas toBlob Polyfill for Edge, courtesy of https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#Polyfill
-	if (!HTMLCanvasElement.prototype.toBlob) {
-	  Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-	    value: function (callback, type, quality) {
-	      var dataURL = this.toDataURL(type, quality).split(',')[1]
-	      setTimeout(function() {
-	        var binStr = atob( dataURL ),
-	            len = binStr.length,
-	            arr = new Uint8Array(len)
-	        for (var i = 0; i < len; i++ ) {
-	          arr[i] = binStr.charCodeAt(i)
-	        }
-	        callback( new Blob( [arr], {type: type || 'image/png'} ) )
-	      });
-	    }
-	  });
-	}
+  if (!HTMLCanvasElement.prototype.toBlob) {
+    Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+      value: function (callback, type, quality) {
+        var dataURL = this.toDataURL(type, quality).split(',')[1]
+        setTimeout(function () {
+          var binStr = atob(dataURL),
+            len = binStr.length,
+            arr = new Uint8Array(len)
+          for (var i = 0; i < len; i++) {
+            arr[i] = binStr.charCodeAt(i)
+          }
+          callback(new Blob([arr], { type: type || 'image/png' }))
+        });
+      }
+    });
+  }
   // Offscreen canvas and context
   let Canvas = document.createElement('canvas')
   let Context = Canvas.getContext('2d')
+
   // Individual sections -- generates to tabs and tab contents
   let Sections = [
     { name: "🖼️ File",
@@ -95,11 +114,11 @@ let shupload =  (function() {
               },
               autoplay: true
             }),
-            (pv.state.pictureTaken ? 
+            (pv.state.pictureTaken ?
               m(".Preview", {
-                style: "background-image: url("+Canvas.toDataURL()+");"
+                style: "background-image: url(" + Canvas.toDataURL() + ");"
               })
-            :
+              :
               null),
             m(".Buttons",
               (pv.state.pictureTaken ?
@@ -118,13 +137,13 @@ let shupload =  (function() {
                   }, "↩ Retake"),
                   m(".Button", {
                     onclick: () => {
-                    	Canvas.toBlob((blob) => {
-                        sendFile(blob, pv.state.filename+".png")
-                    	})
+                      Canvas.toBlob((blob) => {
+                        sendFile(blob, pv.state.filename + ".png")
+                      })
                     }
                   }, "⇪ Upload")
                 ]
-              :
+                :
                 m(".Button", {
                   onclick: () => {
                     pv.state.pictureTaken = true
@@ -177,11 +196,11 @@ let shupload =  (function() {
               },
               autoplay: true
             }),
-            (pv.state.pictureTaken ? 
+            (pv.state.pictureTaken ?
               m(".Preview", {
-                style: "background-image: url("+Canvas.toDataURL()+");"
+                style: "background-image: url(" + Canvas.toDataURL() + ");"
               })
-            :
+              :
               null),
             m(".Buttons",
               (pv.state.pictureTaken ?
@@ -212,13 +231,13 @@ let shupload =  (function() {
                   }, "↩ Retake"),
                   m(".Button", {
                     onclick: () => {
-                    	Canvas.toBlob((blob) => {
-                        sendFile(blob, pv.state.filename+".png")
-                    	})
+                      Canvas.toBlob((blob) => {
+                        sendFile(blob, pv.state.filename + ".png")
+                      })
                     }
                   }, "⇪ Upload")
                 ]
-              :
+                :
                 m(".Button", {
                   onclick: () => {
                     pv.state.pictureTaken = true
@@ -258,6 +277,7 @@ let shupload =  (function() {
       }
     },
   ]
+
   // Upload Bar located at the bottom of the view
   let UploadBar = {
     StateClasses: [
@@ -281,8 +301,8 @@ let shupload =  (function() {
     RemainingTime: 0,
     TargetTime: 2500,
     UpdateTotals: (sent, total) => {
-      UploadBar.Sent = Math.round(sent/1024)
-      UploadBar.Total = Math.round(total/1024)
+      UploadBar.Sent = Math.round(sent / 1024)
+      UploadBar.Total = Math.round(total / 1024)
       UploadBar.Progress = (sent / total) * 100
     },
     Component: {
@@ -292,17 +312,18 @@ let shupload =  (function() {
           UploadBar.State == UploadBar.States.Idle ?
             "Idle"
             :
-          UploadBar.State == UploadBar.States.Sending ?
-            "Sent: " + (UploadBar.Sent + " / " + UploadBar.Total + " kB")
-            :
-          UploadBar.State == UploadBar.States.Errored ?
-            "Error"
-            :
-            ("Uploaded, redirecting in " + (UploadBar.RemainingTime.toFixed(1)) + "s")
+            UploadBar.State == UploadBar.States.Sending ?
+              "Sent: " + (UploadBar.Sent + " / " + UploadBar.Total + " kB")
+              :
+              UploadBar.State == UploadBar.States.Errored ?
+                "Error"
+                :
+                ("Uploaded, redirecting in " + (UploadBar.RemainingTime.toFixed(1)) + "s")
         ))
       }
     }
   }
+
   // Main state and rendering component
   let Main = {
     CurrentSection: 0,
@@ -325,7 +346,7 @@ let shupload =  (function() {
           ondrop: (e) => {
             e.stopPropagation()
             e.preventDefault()
-            sendFile(e.dataTransfer.files[0])
+            sendFile(e.dataTransfer.files)
           },
           ondragover: (e) => {
             e.stopPropagation()
@@ -348,17 +369,23 @@ let shupload =  (function() {
       }
     }
   }
+
   // Method for sending a file via POST
   function sendFile(file, filename) {
     UploadBar.State = UploadBar.States.Sending
-    let r = new XMLHttpRequest()
-    let d = new FormData()
+    const r = new XMLHttpRequest()
+    const d = new FormData()
+    const files = !file.length ? [file] : file
+
     //r.setRequestHeader('Content-type', 'multipart/form-data')
-    if (filename !== undefined) {
-      d.append('file', file, filename)
-    } else {
-      d.append('file', file)
+    for (const f of files) {
+      if (filename !== undefined) {
+        d.append('file', f, filename)
+      } else {
+        d.append('file', f)
+      }
     }
+
     r.addEventListener('load', (e) => {
       UploadBar.State = UploadBar.States.Success
       UploadBar.StartTime = new Date()
@@ -384,199 +411,218 @@ let shupload =  (function() {
     r.open('POST', '')
     r.send(d)
   }
-  // Method for presenting the user with a file select prompt
-  function selectFile() {
-    let inp = document.createElement('input')
-    inp.setAttribute('type', 'file')
-    inp.setAttribute('accept', 'image/*')
-    inp.style = "display:none";
-    inp.addEventListener('change', (e) => {
-      sendFile(e.target.files[0])
-      inp.parentNode.removeChild(inp)
-    })
-    // element must exist for iOS so we add it
-    document.body.appendChild(inp)
-    inp.click()
-  }
 
   // Status bar
   let StatusBar = {
     Component: {
       view: () => {
-        return m("#StatusBar", View.CreationTime)
+        return m("#StatusBar", Views[0].CreationTime)
       }
     }
   }
-  // View state and rendering component
-  let View = {
-    Filename: "",
-    Entryname: "",
-    Propername: "",
-    Type: "",
-    HiddenImage: document.createElement('img'),
-    TabContent: null,
-    ImageHeight: "",
-    ImageWidth: "",
-    isZoomed: false,
-    isScaled: false,
-    calculateImageSize: () => {
-      if (!View.TabContent) return
-      if (View.isZoomed) {
-        View.ImageWidth = View.HiddenImage.width
-        View.ImageHeight = View.HiddenImage.height
-        return
-      }
-      let b = View.TabContent.getBoundingClientRect()
-      let r = Math.min(b.width / View.HiddenImage.width, b.height / View.HiddenImage.height)
-      View.isScaled = r > 1 ? true : false
-      View.ImageWidth = View.HiddenImage.width * r
-      View.ImageHeight = View.HiddenImage.height * r
-      m.redraw()
-    },
-    Component: {
-      view: (vnode) => {
-        return m("section#Main.View", {
-        }, [
-          m("section.Tabs", [
-            m('a', {
-              href: './',
-              title: "Return to Upload"
-            }, m('section.Tab', '↩')),
-            m('.Label', {
-              style: "flex: 1;"
-            }, [
-              m('a', {
-                href: View.Entryname,
-                onclick: (e) => {
-                  e.preventDefault()
-                  // Attempt to use modern clipboard functionality
-                  if (navigator.clipboard) {
-                    navigator.clipboard.writeText(e.target.href).then(() => {
-                    }, (err) => {
-                      console.log(err)
-                      alert(err)
-                    })
-                  // Otherwise use THE CLASSIC.
-                  } else {
-                    let link = document.createElement('a')
-                    link.href = View.Entryname
-                    let Textarea = document.createElement('textarea')
-                    Textarea.value = link.href
-                    document.body.appendChild(Textarea)
-                    Textarea.focus()
-                    Textarea.select()
-                    try {
-                      let success = document.execCommand('copy')
-                      if (!success) {
-                        alert('could not copy to clipboard')
-                      }
-                    } catch (err) {
-                      console.log(err)
-                      alert(err)
-                    }
-                    document.body.removeChild(Textarea)
-                  }
-                },
-                title: "Copy Link to Clipboard"
-              }, '🔗'),
-              m('.Label', View.Propername),
-              m('a', {
-                href: View.Entryname+'/'+View.Filename,
-                title: "Download file"
-              }, '⬇')
-            ])
-          ]),
-          m("section.TabContent" + (View.isScaled ? (".Scaled" + (View.isZoomed ? ".ZoomedOut" : ".ZoomedIn")) : (View.isZoomed ? ".ZoomedIn" : ".ZoomedOut")),
-            { 
-              oncreate: (vnode) => {
-                View.TabContent = vnode.dom
-              }
-            },
-            [
-            View.Type === "image" ? 
-              m('.DataContainer'+ (View.ImageZoom ? '.Zoomed' : ''), {
-                style: "width: "+View.ImageWidth+"px;height: "+View.ImageHeight+"px;background-image: url(" + View.Entryname + "/" + View.Filename + ");",
-                onclick: e => {
-                  e.preventDefault()
-                  View.isZoomed = !View.isZoomed
-                  View.calculateImageSize()
-                }
-              })
-            : View.Type === "audio" ?
-              m('.DataContainer', 
-                m('audio', {
-                  controls: true,
-                  src: View.Entryname+"/"+View.Filename,
-                })
-              )
-            : View.Type === "video" ?
-              m('.DataContainer',
-                m('video', {
-                  controls: true,
-                }, m('source', {
-                  src: View.Entryname+"/"+View.Filename,
-                  type: View.Mimetype,
-                }))
-              )
-            : m('.DataContainer', m.trust(View.DataHTML))
-          ]),
-          m(StatusBar.Component)
-        ])
-      }
-    }
-  }
-  let $ = {
-    letsGo: () => {
-      let target = document.getElementById("Container")
-      if (target.children[0].className == "View") {
-        let fpart = document.getElementById("Filename")
-        if (fpart) {
-          View.Propername = fpart.innerText
+
+  // this state and rendering component
+  const Views = [];
+  const createView = () => {
+    return {
+      Filename: "",
+      Entryname: "",
+      Propername: "",
+      Type: "",
+      HiddenImage: document.createElement('img'),
+      TabContent: null,
+      ImageHeight: "",
+      ImageWidth: "",
+      isZoomed: false,
+      isScaled: false,
+      calculateImageSize: (view) => {
+        if (!view.TabContent) return
+        if (view.isZoomed) {
+          console.log('is zoomed');
+          view.ImageWidth = view.HiddenImage.width
+          view.ImageHeight = view.HiddenImage.height
+          return
         }
+        let b = view.TabContent.getBoundingClientRect()
+        let r = Math.min(b.width / view.HiddenImage.width, b.height / view.HiddenImage.height)
+        view.isScaled = r > 1 ? true : false
+        view.ImageWidth = view.HiddenImage.width * r
+        view.ImageHeight = view.HiddenImage.height * r
+        m.redraw()
+      },
+      GetComponent: (view) => {
+        return { view: (vnode) => {
+          return m("section#Main.View", {
+          }, [
+            m("section.Tabs", [
+              m('a', {
+                href: './',
+                title: "Return to Upload"
+              }, m('section.Tab', '↩')),
+              m('.Label', {
+                style: "flex: 1;"
+              }, [
+                m('a', {
+                  href: view.Entryname,
+                  onclick: (e) => {
+                    e.preventDefault()
+                    // Attempt to use modern clipboard functionality
+                    if (navigator.clipboard) {
+                      navigator.clipboard.writeText(e.target.href).then(() => {
+                      }, (err) => {
+                        console.log(err)
+                        alert(err)
+                      })
+                      // Otherwise use THE CLASSIC.
+                    } else {
+                      let link = document.createElement('a')
+                      link.href = view.Entryname
+                      let Textarea = document.createElement('textarea')
+                      Textarea.value = link.href
+                      document.body.appendChild(Textarea)
+                      Textarea.focus()
+                      Textarea.select()
+                      try {
+                        let success = document.execCommand('copy')
+                        if (!success) {
+                          alert('could not copy to clipboard')
+                        }
+                      } catch (err) {
+                        console.log(err)
+                        alert(err)
+                      }
+                      document.body.removeChild(Textarea)
+                    }
+                  },
+                  title: "Copy Link to Clipboard"
+                }, '🔗'),
+                m('.Label', view.Propername),
+                m('a', {
+                  href: view.Entryname + '/' + view.Filename,
+                  title: "Download file"
+                }, '⬇')
+              ])
+            ]),
+            m("section.TabContent" + (view.isScaled ? (".Scaled" + (view.isZoomed ? ".ZoomedOut" : ".ZoomedIn")) : (view.isZoomed ? ".ZoomedIn" : ".ZoomedOut")),
+              {
+                oncreate: (vnode) => {
+                  view.TabContent = vnode.dom
+                }
+              },
+              [
+                view.Type === "image" ?
+                  m('.DataContainer' + (view.ImageZoom ? '.Zoomed' : ''), {
+                    style: "width: " + view.ImageWidth + "px;" +
+                          "height: " + view.ImageHeight + "px;" +
+                          "background-image: url(" + view.Entryname + "/" + view.Filename + ");",
+                    onclick: e => {
+                      e.preventDefault()
+                      view.isZoomed = !view.isZoomed
+                      view.calculateImageSize(view)
+                    }
+                  })
+                  : view.Type === "audio" ?
+                    m('.DataContainer',
+                      m('audio', {
+                        controls: true,
+                        src: view.Entryname + "/" + view.Filename,
+                      })
+                    )
+                    : view.Type === "video" ?
+                      m('.DataContainer',
+                        m('video', {
+                          controls: true,
+                        }, m('source', {
+                          src: view.Entryname + "/" + view.Filename,
+                          type: view.Mimetype,
+                        }))
+                      )
+                      : m('.DataContainer', m.trust(view.DataHTML))
+              ]),
+            m(StatusBar.Component)
+          ])
+        }
+      }
+    }
+  }
+}
+
+  const $ = {
+    letsGo: () => {
+      const container = document.getElementById("Container")
+      if (container.children[0].className == "View") {
+        const fpart = document.getElementById("Filename")
+        const Propername = fpart ? fpart.innerText : ''
+
         // First we retrieve the image reference
-        let img = document.getElementsByTagName("img")[0]
-        let audio = document.getElementsByTagName("audio")[0]
-        let video = document.getElementsByTagName("video")[0]
-        if (img) {
-          let parts = img.getAttribute('src').split('/')
-          View.Entryname = parts[0]
-          View.Filename = parts[1]
-          View.Type = "image"
-          View.HiddenImage.addEventListener('load', e => {
-            View.calculateImageSize()
+        const imgs = document.getElementsByTagName("img")
+        const audios = document.getElementsByTagName("audio")
+        const videos = document.getElementsByTagName("video")
+        for (const img of imgs) {
+          const parts = img.getAttribute('src').split('/')
+          const view = {
+            ...createView(),
+            Propername,
+            Entryname: parts[0],
+            Filename: parts[1],
+            Type: "image"
+          }
+          view.HiddenImage.addEventListener('load', e => {
+            view.calculateImageSize(view)
           })
           window.addEventListener('resize', e => {
-            View.calculateImageSize()
+            view.calculateImageSize(view)
           })
-          View.HiddenImage.src = parts.join('/')
-        } else if (audio) {
-          let parts = audio.getAttribute('src').split('/')
-          View.Entryname = parts[0]
-          View.Filename = parts[1]
-          View.Type = "audio"
-        } else if (video) {
-          let source = video.getElementsByTagName("source")[0]
-          if (source) {
-            let parts = source.getAttribute('src').split('/')
-            View.Entryname = parts[0]
-            View.Filename = parts[1]
-            View.Type = "video"
-            View.Mimetype = source.getAttribute('type')
+          view.HiddenImage.src = parts.join('/')
+          Views.push(view)
+        }
+        for (const audio of audios) {
+          const parts = audio.getAttribute('src').split('/')
+          const view = {
+            ...createView(),
+            Propername,
+            Entryname: parts[0],
+            Filename: parts[1],
+            Type: "audio"
           }
-        } else {
-          let target = document.getElementsByClassName("Label")[0]
+          Views.push(view)
+        }
+        for (const video of videos) {
+          const source = video.getElementsByTagName("source")[0]
+          if (source) {
+            const parts = source.getAttribute('src').split('/')
+            const view = {
+              ...createView,
+              Propername,
+              Entryname: parts[0],
+              Filename: parts[1],
+              Type: "video",
+              Mimetype: source.getAttribute('type')
+            }
+            Views.push(view)
+          }
+        }
+        if(!imgs && !audios && !videos) {
+          const target = document.getElementsByClassName("Label")[0]
           let a = target.getElementsByTagName("a")[0]
+          let view;
           if (a) {
             let parts = a.getAttribute('href').split('/')
-            View.Entryname = parts[0]
-            View.Filename = parts[1]
+            view = {
+              ...createView(),
+              Entryname: parts[0],
+              Filename: parts[1],
+            }
           }
-          View.DataHTML = document.getElementsByClassName("DataContainer")[0].innerText
+          view.DataHTML = document.getElementsByClassName("DataContainer")[0].innerText
+          Views.push(view);
         }
-        View.CreationTime = document.getElementById("StatusBar").innerHTML
-        m.mount(document.getElementById("Container"), View.Component)
-      } else if (target.children[0].className == "Upload") {
-        m.mount(document.getElementById("Container"), Main.Component)
+        // this.CreationTime = document.getElementById("StatusBar").innerHTML
+        for (const view of Views) {
+          m.mount(container, view.GetComponent(view))
+        }
+      } else if (container.children[0].className == "Upload") {
+        m.mount(container, Main.Component)
       }
     }
   }

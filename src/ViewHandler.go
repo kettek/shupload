@@ -53,16 +53,18 @@ func (h *ViewHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	filename, req.URL.Path = ShiftPath(req.URL.Path)
 
 	entries, err := AppInstance.DataBase.GetEntries(key)
+	if err != nil || len(entries) < 1 {
+		// TODO: 404 redirect!
+		http.Error(res, "No such files!", http.StatusNotFound)
+		return
+	}
+
 	responseData := ResponseData {
 		Key: key,
 	  Files: []FileMetadata{},
 		CreationTime: entries[0].CreationTime.Format("2006-01-02 15:04:05"),
 	}
-	if err != nil {
-		// TODO: 404 redirect!
-		http.Error(res, "No such files!", http.StatusNotFound)
-		return
-	}
+
 	for _, entry := range entries {
 		if filename == "" {
 			// If we're getting the metadata for an upload
@@ -74,11 +76,6 @@ func (h *ViewHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 				CreationTime: entry.CreationTime.Format("2006-01-02 15:04:05"),
 			}
 			responseData.Files = append(responseData.Files, data)
-			if err != nil {
-				http.Error(res, "Failed to execute template", http.StatusInternalServerError)
-				log.Print(err)
-				return
-			}
 		} else if filename == entry.Filename {
 			// If we're directly accessing a specific file
 			data, err := AppInstance.DataBase.GetEntryStream(entry.Key)
@@ -107,9 +104,14 @@ func (h *ViewHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	// If we've populated the response data, render the template
 	//  -- These templates could probably be combined and just one used
 	if len(responseData.Files) > 1 {
-		h.multipleTemplate.Execute(res, responseData)
-	} else if len(responseData.Files) > 0 {
-		h.template.Execute(res, responseData.Files[0])
+		err = h.multipleTemplate.Execute(res, responseData)
+	} else if len(responseData.Files) == 1 {
+		err = h.template.Execute(res, responseData.Files[0])
+	}
+	if err != nil {
+		http.Error(res, "Failed to execute template", http.StatusInternalServerError)
+		log.Print(err)
+		return
 	}
 }
 
@@ -123,7 +125,7 @@ func (h *ViewHandler) LoadTemplate() error {
 	if err != nil {
 		return err
 	}
-	
+
 	h.template, err = template.New("view").Funcs(template.FuncMap{
 		"regexMatch": func(r, s string) bool {
 			matched, _ := regexp.Match(r, []byte(s))

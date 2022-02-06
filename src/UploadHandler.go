@@ -47,7 +47,7 @@ func (h *UploadHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		_, key, err := AppInstance.DataBase.CreateEntries(fileHandlers)
 		if err != nil {
 			log.Print(err)
-			http.Error(res, "Failed to create entry", http.StatusInternalServerError)
+			http.Error(res, "Failed to create entries", http.StatusInternalServerError)
 			return
 		}
 

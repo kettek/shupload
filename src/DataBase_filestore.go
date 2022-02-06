@@ -27,6 +27,8 @@ import (
 	"path/filepath"
 
 	//
+
+	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -85,7 +87,7 @@ func NewMetaDriver(db string) (m *MetaDriver, err error) {
 func (m *MetaDriver) Get(key string) (entries []DataBaseEntry, err error) {
   entries, ok := m.db[key]
   if !ok {
-    // TODO: return error (does not exist)
+		err = fmt.Errorf("file not found: %s", key)
   }
   return
 }
@@ -132,6 +134,7 @@ func (d *DataBase) CreateEntries(h []*multipart.FileHeader) (entries []DataBaseE
 	for i, header := range h {
 		entryKey := d.GetKey()
 		if (len(header.Filename) > AppInstance.Config.MaxFilenameLength) {
+			err = fmt.Errorf("file name length limit exceeded: %d > %d", len(header.Filename), AppInstance.Config.MaxFilenameLength)
 			return
 		}
 	
@@ -140,6 +143,7 @@ func (d *DataBase) CreateEntries(h []*multipart.FileHeader) (entries []DataBaseE
 		kbSize := float64(fileSize) / float64(kbLimit)
 	
 		if (int(kbSize) > AppInstance.Config.MaxFileSize) {
+			err = fmt.Errorf("file size limit exceeded: %d > %d", int(kbSize), AppInstance.Config.MaxFileSize)
 			return
 		}
 	
@@ -149,6 +153,7 @@ func (d *DataBase) CreateEntries(h []*multipart.FileHeader) (entries []DataBaseE
 			Filename: header.Filename,
 			Mimetype: mime.TypeByExtension(filepath.Ext(header.Filename)),
 		}
+
 		entries[i] = entry
 		file, _ := header.Open()
 		err = d.fileDB.Write(entryKey, file)

@@ -18,8 +18,8 @@
         </a>
       </section>
       <section class="TabContent NoJS">
-      {{ range .Data }}
-      <div class="Label" style="flex: 1"><a href="{{.Entryname}}/{{.Filename}}">🔗</a>&nbsp;<span id="Filename">{{.Filename}}</span>&nbsp;<a href="{{.Entryname}}/{{.Filename}}">⬇</a></div>
+      {{range .Files}}
+      <div class="Label"><a href="{{.Entryname}}/{{.Filename}}">🔗</a>&nbsp;<span id="Filename">{{.Filename}}</span>&nbsp;<a href="{{.Entryname}}/{{.Filename}}">⬇</a></div>
         <div class="DataContainer">
           {{if or (eq .Filename "blob") (regexMatch "image/.*" .Mimetype) }}
             <label>

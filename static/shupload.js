@@ -263,16 +263,15 @@ let shupload = (function () {
         },
         view: () => {
           return m("textarea.Clipboard", {
-            placeholder: "Use ⌃v or ⌘v to paste an image here.",
+            placeholder: "Use ⌃v or ⌘v to paste a file or files here.",
             onpaste: (e) => {
               if (e.clipboardData && e.clipboardData.items) {
-                let items = e.clipboardData.items
-                for (let i = 0; i < items.length; i++) {
-                  if (items[i].type.indexOf('image') !== -1) {
-                    sendFile(items[i].getAsFile())
-                    e.preventDefault();
-                  }
-                }
+                const items = e.clipboardData.items
+                const files = []
+                for(const item of items)
+                  files.push(item.getAsFile())
+                sendFile(files)
+                e.preventDefault()
               }
             }
           })

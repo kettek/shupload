@@ -40,7 +40,7 @@ func (h *ViewHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	key, req.URL.Path = ShiftPath(req.URL.Path)
 	filename, req.URL.Path = ShiftPath(req.URL.Path)
 
-	escapedFilename, err := url.QueryUnescape(filename)
+	escapedFilename, err := url.PathUnescape(filename)
 	if err != nil {
 		http.Error(res, "Failed to unescape filename", http.StatusInternalServerError)
 		return
@@ -62,9 +62,9 @@ func (h *ViewHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			Entryname       string
 			CreationTime    string
 		}{
-			URI:             path.Join(key, url.QueryEscape(entry.Filename)),
+			URI:             path.Join(key, url.PathEscape(entry.Filename)),
 			Filename:        entry.Filename,
-			EscapedFilename: url.QueryEscape(entry.Filename),
+			EscapedFilename: url.PathEscape(entry.Filename),
 			Mimetype:        entry.Mimetype,
 			Entryname:       key,
 			CreationTime:    entry.CreationTime.Format("2006-01-02 15:04:05"),

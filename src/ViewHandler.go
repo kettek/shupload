@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"path"
 	"regexp"
 	"strconv"
@@ -39,6 +40,12 @@ func (h *ViewHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	key, req.URL.Path = ShiftPath(req.URL.Path)
 	filename, req.URL.Path = ShiftPath(req.URL.Path)
 
+	escapedFilename, err := url.QueryUnescape(filename)
+	if err != nil {
+		http.Error(res, "Failed to unescape filename", http.StatusInternalServerError)
+		return
+	}
+
 	entry, err := AppInstance.DataBase.GetEntry(key)
 	if err != nil {
 		// TODO: 404 redirect!
@@ -46,19 +53,21 @@ func (h *ViewHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if filename == "" {
+	if escapedFilename == "" {
 		data := struct {
-			URI          string
-			Filename     string
-			Mimetype     string
-			Entryname    string
-			CreationTime string
+			URI             string
+			Filename        string
+			EscapedFilename string
+			Mimetype        string
+			Entryname       string
+			CreationTime    string
 		}{
-			URI:          path.Join(key, entry.Filename),
-			Filename:     entry.Filename,
-			Mimetype:     entry.Mimetype,
-			Entryname:    key,
-			CreationTime: entry.CreationTime.Format("2006-01-02 15:04:05"),
+			URI:             path.Join(key, url.QueryEscape(entry.Filename)),
+			Filename:        entry.Filename,
+			EscapedFilename: url.QueryEscape(entry.Filename),
+			Mimetype:        entry.Mimetype,
+			Entryname:       key,
+			CreationTime:    entry.CreationTime.Format("2006-01-02 15:04:05"),
 		}
 		err := h.template.Execute(res, data)
 		if err != nil {
@@ -66,7 +75,7 @@ func (h *ViewHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			log.Print(err)
 			return
 		}
-	} else if filename == entry.Filename {
+	} else if escapedFilename == entry.Filename {
 		data, err := AppInstance.DataBase.GetEntryStream(key)
 		if err != nil {
 			http.Error(res, "Data file missing", http.StatusInternalServerError)

@@ -68,6 +68,9 @@ a {
   overflow: auto;
   position: static;
 }
+#Main.View .TabContent .DataItem {
+  position: relative;
+}
 #Main.View .TabContent.ZoomedIn .DataContainer {
   flex: auto;
   z-index: 2;

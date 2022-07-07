@@ -87,6 +87,7 @@ func NewMetaDriver(db string) (m *MetaDriver, err error) {
 	if err := json.Unmarshal([]byte(bytes), &oldDB); err == nil {
 		m.db = make(map[string][]DataBaseEntry)
 		for k, e := range oldDB {
+			e.Key = k
 			m.db[k] = []DataBaseEntry{e}
 		}
 		err = m.Sync()

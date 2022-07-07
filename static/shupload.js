@@ -441,7 +441,7 @@ let shupload = (function () {
     }
   }
   let currentlyZoomed = false;
-  const createView = () => {
+  const createView = (solo) => {
     return {
       Filename: "",
       Entryname: "",
@@ -483,7 +483,7 @@ let shupload = (function () {
                     display: currentlyZoomed ? 'none': ''
                   }
                 }, [
-                  m('a', {
+                  solo ? m('a', {
                     href: `${view.Entryname}/${view.Filename}`,
                     onclick: (e) => {
                       e.preventDefault()
@@ -516,7 +516,7 @@ let shupload = (function () {
                       }
                     },
                     title: "Copy Link to Clipboard"
-                  }, '🔗'),
+                  }, '🔗') : null,
                   m('.Label', decodeURIComponent(view.Filename)),
                   m('a', {
                     href: view.Entryname + '/' + view.Filename,
@@ -574,7 +574,7 @@ let shupload = (function () {
         // First we retrieve the data items
         const dataItems = document.getElementsByClassName("DataItem")
         for (const item of dataItems) {
-          let view = createView();
+          let view = createView(len(dataItems)===1);
           const img = item.getElementsByTagName("img")[0]
           const audio = item.getElementsByTagName("audio")[0]
           const video = item.getElementsByTagName("video")[0]

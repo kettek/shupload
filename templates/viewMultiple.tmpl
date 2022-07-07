@@ -16,11 +16,12 @@
         <a href="./">
           <section class="Tab">↩</section>
         </a>
+        <div class="Label" style="flex: 1"><a href="{{.Key}}">🔗</a>&nbsp;<span id="Filename">{{len .Files}} Files</span>&nbsp;<a style="opacity: 0.5; cursor: not-allowed">⬇</a></div>
       </section>
       <section class="TabContent NoJS">
       {{range .Files}}
       <div class="DataItem" id="{{.Entryname}}/{{.Filename}}">
-        <div class="Label"><a href="{{.Entryname}}/{{.EscapedFilename}}">🔗</a>&nbsp;<span id="Filename">{{.Filename}}</span>&nbsp;<a href="{{.Entryname}}/{{.EscapedFilename}}">⬇</a></div>
+        <div class="Label">&nbsp;<span id="Filename">{{.Filename}}</span>&nbsp;<a href="{{.Entryname}}/{{.EscapedFilename}}">⬇</a></div>
         <div class="DataContainer">
           {{if or (eq .Filename "blob") (regexMatch "image/.*" .Mimetype) }}
             <label>

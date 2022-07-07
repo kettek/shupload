@@ -105,6 +105,12 @@ a {
 #Main.View .Tab {
   flex: 0;
 }
+
+#Main.View .ParentContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 /*
 Hacky stuff for CSS image click
 */

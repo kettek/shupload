@@ -523,7 +523,7 @@ let shupload = (function () {
                     title: "Download file"
                   }, '⬇')
                 ]),
-                m("section.TabContent" + (view.isScaled ? (".Scaled" + (view.isZoomed ? ".ZoomedIn" : ".ZoomedOut")) : (view.isZoomed ? ".ZoomedIn" : ".ZoomedOut")),
+                m("section" + (view.isScaled ? (".Scaled" + (view.isZoomed ? ".ZoomedIn" : ".ZoomedOut")) : (view.isZoomed ? ".ZoomedIn" : ".ZoomedOut")),
                   {
                     oncreate: (vnode) => {
                       view.TabContent = document.getElementsByClassName("TabContent", "NoJS")[0]

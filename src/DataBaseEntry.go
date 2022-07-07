@@ -19,10 +19,11 @@ along with shupload.  If not, see <https://www.gnu.org/licenses/>.
 package main
 
 import (
-  "time"
+	"time"
 )
 
 type DataBaseEntry struct {
+	Key string
   CreationTime time.Time `json:"time"`
   Filename string `json:"filename"`
   Mimetype string

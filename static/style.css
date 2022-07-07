@@ -60,7 +60,6 @@ a {
   box-shadow: none;
 }
 #Main.View .TabContent {
-  height: 0
 }
 #Main.View .TabContent.ZoomedIn {
   height: auto;
@@ -71,15 +70,19 @@ a {
 }
 #Main.View .TabContent.ZoomedIn .DataContainer {
   flex: auto;
-  position: absolute;
-  top: 0;
-  left: 0;
+  z-index: 2;
+  /* breaking gif zoom? 
+    position: absolute;
+    top: 0;
+    left: 0;
+  */
   cursor: zoom-out;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
 #Main.View .TabContent.ZoomedOut .DataContainer {
+  z-index: 0;
   cursor: zoom-in;
   background-size: contain;
   background-repeat: no-repeat;
@@ -95,9 +98,6 @@ a {
 }
 #Main.View .TabContent.Scaled {
 }
-#Main.View .TabContent.Scaled.ZoomedIn .DataContainer {
-  position: static;
-}
 
 #Main.View .Tab {
   flex: 0;
@@ -106,9 +106,6 @@ a {
 Hacky stuff for CSS image click
 */
 .NoJS .DataContainer {
-  flex: 1;
-  display: flex;
-  flex-flow: row nowrap;
   cursor: zoom-in;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -128,6 +125,9 @@ Hacky stuff for CSS image click
   cursor: zoom-in;
 }
 .NoJS .DataContainer label input:checked ~ img {
+  position: absolute;
+  left: 0;
+  top: 0;
   object-fit: cover;
   width: auto;
   height: auto;
@@ -182,12 +182,7 @@ Hacky stuff for CSS image click
   justify-content: center;
   background-color: #111119;
 }
-.TabContent.NoJS {
-  align-items: stretch;
-  justify-content: stretch;
-}
 .TabContent * {
-  z-index: 2;
 }
 .TabContent::before {
   content: '';
@@ -262,6 +257,10 @@ Hacky stuff for CSS image click
 video {
   max-width: 100%;
   overflow: auto;
+  cursor: default;
+}
+audio {
+  cursor: default;
 }
 .Preview {
   margin: 0;

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{{.Key}} - shupload</title>
+  <link rel="icon" type="image/png" href="./static/shupload-32x32.png" />
+  <link rel="stylesheet" type="text/css" href="./static/style.css" />
+  <link href="https://fonts.googleapis.com/css?family=ZCOOL+QingKe+HuangYou" rel="stylesheet">
+  <script src="https://unpkg.com/mithril/mithril.js"></script>
+  <script type="text/javascript" src="./static/shupload.js"></script>
+</head>
+<body>
+  <section id="Container">
+    <section id="Main" class="View">
+      <section class="Tabs">
+        <a href="./">
+          <section class="Tab">↩</section>
+        </a>
+        <div class="Label" style="flex: 1"><a href="{{.Key}}">🔗</a>&nbsp;<span id="Filename">{{len .Files}} Files</span>&nbsp;<a style="opacity: 0.5; cursor: not-allowed">⬇</a></div>
+      </section>
+      <section class="TabContent NoJS">
+      {{range .Files}}
+      <div class="DataItem" id="{{.Entryname}}/{{.Filename}}">
+        <div class="Label">&nbsp;<span id="Filename">{{.Filename}}</span>&nbsp;<a href="{{.Entryname}}/{{.EscapedFilename}}">⬇</a></div>
+        <div class="DataContainer">
+          {{if or (eq .Filename "blob") (regexMatch "image/.*" .Mimetype) }}
+            <label>
+              <input type="checkbox">
+              <img src="{{.URI}}">
+            </label>
+          {{else if regexMatch "audio/.*" .Mimetype}}
+            <audio controls src="{{.URI}}">
+              Your browser does not support the <code>audio</code> element.
+            </audio>
+          {{else if regexMatch "video/.*" .Mimetype}}
+            <video controls>
+              <source src="{{.URI}}" type={{.Mimetype}}>
+              Your browser does not support the <code>video</code> element.
+            </video>
+          {{end}}
+        </div>
+      </div>
+      {{ end }}
+      </section>
+      <div id="StatusBar">
+        {{.CreationTime}}
+      </div>
+    </section>
+  </section>
+  <small id="Footer"><a href="https://github.com/kettek/shupload">shupload</a> copyright © 2018-2019 <a href="https://kettek.net">Ketchetwahmeegwun T. Southall</a>. Licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPLv3</a></small>
+</body>
+</html>

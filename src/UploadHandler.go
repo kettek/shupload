@@ -19,11 +19,11 @@ along with shupload.  If not, see <https://www.gnu.org/licenses/>.
 package main
 
 import (
-  "net/http"
-  "html/template"
-  "log"
-  "io/ioutil"
-  "fmt"
+	"fmt"
+	"html/template"
+	"io/ioutil"
+	"log"
+	"net/http"
 )
 
 
@@ -42,17 +42,15 @@ func (h *UploadHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
     }
   } else if (req.Method == "POST") {
     req.ParseMultipartForm(32 << 20)
-    file, handler, err := req.FormFile("file")
-    if err != nil {
-      log.Print(err)
-      return
-    }
-    _, key, err := AppInstance.DataBase.CreateEntry(file, handler)
-    if err != nil {
-      log.Print(err)
-      http.Error(res, "Failed to create entry", http.StatusInternalServerError)
-      return
-    }
+		fileHandlers := req.MultipartForm.File["file"]
+
+		_, key, err := AppInstance.DataBase.CreateEntries(fileHandlers)
+		if err != nil {
+			log.Print(err)
+			http.Error(res, "Failed to create entries", http.StatusInternalServerError)
+			return
+		}
+
     http.Redirect(res, req, key, http.StatusSeeOther)
   } else {
     http.Error(res, "Method Not Allowed", http.StatusMethodNotAllowed)

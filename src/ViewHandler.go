@@ -24,25 +24,27 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"path"
 	"regexp"
 	"strconv"
 )
 
 type ViewHandler struct {
-	template *template.Template
+	template         *template.Template
 	multipleTemplate *template.Template
 }
 type FileMetadata struct {
-	URI          string
-	Filename     string
-	Mimetype     string
-	Entryname    string
-	CreationTime string
+	URI             string
+	Filename        string
+	EscapedFilename string
+	Mimetype        string
+	Entryname       string
+	CreationTime    string
 }
 type ResponseData struct {
-	Key  string
-	Files []FileMetadata
+	Key          string
+	Files        []FileMetadata
 	CreationTime string
 }
 
@@ -52,6 +54,12 @@ func (h *ViewHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	key, req.URL.Path = ShiftPath(req.URL.Path)
 	filename, req.URL.Path = ShiftPath(req.URL.Path)
 
+	escapedFilename, err := url.PathUnescape(filename)
+	if err != nil {
+		http.Error(res, "Failed to unescape filename", http.StatusInternalServerError)
+		return
+	}
+
 	entries, err := AppInstance.DataBase.GetEntries(key)
 	if err != nil || len(entries) < 1 {
 		// TODO: 404 redirect!
@@ -59,24 +67,25 @@ func (h *ViewHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	responseData := ResponseData {
-		Key: key,
-	  Files: []FileMetadata{},
+	responseData := ResponseData{
+		Key:          key,
+		Files:        []FileMetadata{},
 		CreationTime: entries[0].CreationTime.Format("2006-01-02 15:04:05"),
 	}
 
 	for _, entry := range entries {
-		if filename == "" {
+		if escapedFilename == "" {
 			// If we're getting the metadata for an upload
-			data := FileMetadata {
-				URI:          path.Join(key, entry.Filename),
-				Filename:     entry.Filename,
-				Mimetype:     entry.Mimetype,
-				Entryname:    key,
-				CreationTime: entry.CreationTime.Format("2006-01-02 15:04:05"),
+			data := FileMetadata{
+				URI:             path.Join(key, url.PathEscape(entry.Filename)),
+				Filename:        entry.Filename,
+				EscapedFilename: url.PathEscape(entry.Filename),
+				Mimetype:        entry.Mimetype,
+				Entryname:       key,
+				CreationTime:    entry.CreationTime.Format("2006-01-02 15:04:05"),
 			}
 			responseData.Files = append(responseData.Files, data)
-		} else if filename == entry.Filename {
+		} else if escapedFilename == entry.Filename {
 			// If we're directly accessing a specific file
 			data, err := AppInstance.DataBase.GetEntryStream(entry.Key)
 			if err != nil {

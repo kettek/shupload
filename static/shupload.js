@@ -574,7 +574,7 @@ let shupload = (function () {
         // First we retrieve the data items
         const dataItems = document.getElementsByClassName("DataItem")
         for (const item of dataItems) {
-          let view = createView(len(dataItems)===1);
+          let view = createView(dataItems.length===1)
           const img = item.getElementsByTagName("img")[0]
           const audio = item.getElementsByTagName("audio")[0]
           const video = item.getElementsByTagName("video")[0]

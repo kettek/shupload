@@ -54,14 +54,10 @@ a {
   width: 100%;
   height: 100%;
 }
-#Main.View {
-}
 #Main.View .TabContent::after {
   box-shadow: none;
 }
-#Main.View .TabContent {
-}
-#Main.View .TabContent.ZoomedIn {
+#Main.View .ZoomedIn {
   height: auto;
   align-items: stretch;
   justify-content: stretch;
@@ -71,7 +67,7 @@ a {
 #Main.View .TabContent .DataItem {
   position: relative;
 }
-#Main.View .TabContent.ZoomedIn .DataContainer {
+#Main.View .ZoomedIn .DataContainer {
   flex: auto;
   z-index: 2;
   /* breaking gif zoom? 
@@ -84,22 +80,20 @@ a {
   background-repeat: no-repeat;
   background-position: center;
 }
-#Main.View .TabContent.ZoomedOut .DataContainer {
+#Main.View .ZoomedOut .DataContainer {
   z-index: 0;
   cursor: zoom-in;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
-#Main.View .TabContent.Scaled {
+#Main.View .Scaled {
   position: relative;
   image-rendering: -moz-crisp-edges;
   image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;
   justify-content: center;
   align-items: center;
-}
-#Main.View .TabContent.Scaled {
 }
 
 #Main.View .Tab {

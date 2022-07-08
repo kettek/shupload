@@ -454,6 +454,7 @@ let shupload = (function () {
       isZoomed: false,
       isScaled: false,
       calculateImageSize: (view) => {
+        // FIXME: calculate image size returns the entire view's dimensions for image sizing. With multiple files we should restore their original size value rather than scale according to view.
         if (!view.TabContent) return
         if (view.isZoomed) {
           view.ImageWidth = view.HiddenImage.width

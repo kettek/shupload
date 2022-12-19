@@ -109,6 +109,7 @@ a {
 Hacky stuff for CSS image click
 */
 .NoJS .DataContainer {
+  z-index: 0;
   cursor: zoom-in;
   -webkit-touch-callout: none;
   -webkit-user-select: none;

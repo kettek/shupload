@@ -41,7 +41,6 @@ let shupload = (function () {
   function selectFile() {
     let inp = document.createElement('input')
     inp.setAttribute('type', 'file')
-    inp.setAttribute('accept', 'image/*')
     inp.multiple = true
     inp.style = "display:none";
     inp.addEventListener('change', (e) => {

@@ -20,14 +20,12 @@ package main
 
 import (
 	"html/template"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"path"
 	"regexp"
-	"strconv"
 )
 
 type ViewHandler struct {
@@ -92,21 +90,7 @@ func (h *ViewHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 				http.Error(res, "Data file missing", http.StatusInternalServerError)
 				return
 			}
-			// Get our length
-			length, err := data.Seek(0, io.SeekEnd)
-			if err != nil {
-				http.Error(res, "Error while seeking to end of data", http.StatusInternalServerError)
-				return
-			}
-			_, err = data.Seek(0, 0)
-			if err != nil {
-				http.Error(res, "Error while seeking to start of data", http.StatusInternalServerError)
-				return
-			}
-			res.Header().Set("Content-Disposition", "attachment; filename="+filename)
-			res.Header().Set("Content-Type", entry.Mimetype)
-			res.Header().Set("Content-Length", strconv.FormatInt(length, 10))
-			io.Copy(res, data)
+			http.ServeContent(res, req, filename, entry.CreationTime, data)
 		}
 	}
 
